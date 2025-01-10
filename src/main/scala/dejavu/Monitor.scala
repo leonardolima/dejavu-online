@@ -2,6 +2,8 @@ package dejavu
 
 /* Generic Monitoring Code common for all properties. */
 
+import java.io
+
 import net.sf.javabdd.{BDD, BDDFactory}
 import java.io._
 
@@ -15,7 +17,7 @@ object Options {
   var PROFILE: Boolean = false
   var PRINT: Boolean = false
   var BITS: Int = 20
-  var PRINT_LINENUMBER_EACH: Int = 1000
+  var PRINT_LINENUMBER_EACH: Int = 1
   var UNIT_TEST: Boolean = false
   var STATISTICS: Boolean = true
 }
@@ -557,14 +559,14 @@ abstract class Monitor {
 
   /**
     * Submits an entire trace stored in CSV (Comma Separated Value format) format
-    * to the monitor, as an alternative to submitting events one by one. This method
-    * can only be called in offline monitoring.
+    * to the monitor, as an alternative to submitting events one by one.
     *
-    * @param file the log file in CSV format to be verified.
+    * @param reader the stream in CSV format to be verified.
     */
+  val SYNC = "SYNC!"
 
-  def submitCSVFile(file: String) {
-    val in: Reader = new BufferedReader(new FileReader(file))
+  def submitCSVFile(reader: Reader) {
+    val in: Reader = new BufferedReader(reader)
     // DEFAULT.withHeader()
     val timed: Boolean = file.contains(".timed.")
     var eventSize: Int = 0
@@ -576,25 +578,28 @@ abstract class Monitor {
         lineNr += 1
         if (Options.PRINT && lineNr % Options.PRINT_LINENUMBER_EACH == 0) {
           if (lineNr >= 1000000)
-            println(lineNr.toDouble / 1000000 + " M")
+            println("\n**** Time point " + lineNr.toDouble / 1000000 + " M")
           else if (lineNr >= 1000)
-            println(lineNr.toDouble / 1000 + " K")
+            println("\n**** Time point " + lineNr.toDouble / 1000 + " K")
           else
-            println(lineNr.toDouble)
+            println("\n**** Time point " + lineNr.toDouble)
         }
         val name = record.get(0)
-        var args = new ListBuffer[Any]()
-        if (timed) {
-          eventSize = record.size() - 1
-          val timeStamp: Int = record.get(eventSize).toInt
-          setTime(timeStamp)
-        } else {
-          eventSize = record.size()
+        if(name==SYNC) { println("\n**** "+SYNC); System.out.flush()}
+        else {
+          var args = new ListBuffer[Any]()
+          if (timed) {
+            eventSize = record.size() - 1
+            val timeStamp: Int = record.get(eventSize).toInt
+            setTime(timeStamp)
+          } else {
+            eventSize = record.size()
+          }
+          for (i <- 1 until eventSize) {
+            args += record.get(i)
+          }
+          submit(name, args.toList)
         }
-        for (i <- 1 until eventSize) {
-          args += record.get(i)
-        }
-        submit(name, args.toList)
       }
       println(s"Processed $lineNr events")
       in.close()
@@ -629,7 +634,7 @@ abstract class Monitor {
       formula.setTime(deltaTime)
       if (!formula.evaluate()) {
         errors += 1
-        println(s"\n*** Property ${formula.name} violated on event number $lineNr:\n")
+        println(s"\n**** Property violated on event number $lineNr:\n")
         println(state)
       }
     }
