@@ -568,7 +568,8 @@ abstract class Monitor {
   def submitCSVFile(reader: Reader) {
     val in: Reader = new BufferedReader(reader)
     // DEFAULT.withHeader()
-    val timed: Boolean = file.contains(".timed.")
+    // val timed: Boolean = file.contains(".timed.")
+    val timed: Boolean = false
     var eventSize: Int = 0
     time {
       val records: Iterable[CSVRecord] = CSVFormat.DEFAULT.parse(in).asScala

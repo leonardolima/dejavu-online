@@ -1,3 +1,4 @@
+
 /* Generic Monitoring Code common for all properties. */
 
 import java.io
@@ -561,13 +562,13 @@ abstract class Monitor {
     *
     * @param reader the stream in CSV format to be verified.
     */
-
   val SYNC = "SYNC!"
 
   def submitCSVFile(reader: Reader) {
     val in: Reader = new BufferedReader(reader)
     // DEFAULT.withHeader()
-    val timed: Boolean = file.contains(".timed.")
+    // val timed: Boolean = file.contains(".timed.")
+    val timed: Boolean = false
     var eventSize: Int = 0
     time {
       val records: Iterable[CSVRecord] = CSVFormat.DEFAULT.parse(in).asScala

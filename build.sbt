@@ -4,7 +4,7 @@ name := "dejavu"
 
 version := "0.1"
 
-scalaVersion := "2.12.20"
+scalaVersion := "2.11.1"
 
 lazy val resource = taskKey[Unit]("Copy Monitor.scala to resources")
 resource := {
