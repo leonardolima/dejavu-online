@@ -307,7 +307,7 @@ case class Spec(properties: List[Property]) {
         |          openProfileFile("dejavu-profile.csv")
         |          m.printProfileHeader()
         |        }
-        |        m.submitCSVFile(file)
+        |        if (args.length == 3 && args(2) == "timed") m.submitCSVFile(file, true) else m.submitCSVFile(file, false)
         |      } catch {
         |          case e: Throwable =>
         |            println(s"\n*** $e\n")
