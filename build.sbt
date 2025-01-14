@@ -12,7 +12,6 @@ resource := {
   val target = baseDirectory.value+"/src/main/resources/Monitor.txt"
   cat(source) #| "grep -v ^package" #> file(target) !
 }
-
 lazy val pack = taskKey[Unit]("Packages DejaVu")
 pack := {
     val res = resource.value
@@ -20,4 +19,4 @@ pack := {
     val source = file(baseDirectory.value+"/target/scala-2.11/dejavu-assembly-0.1.jar")
     val target = baseDirectory.value+"/out/artifacts/dejavu_jar/dejavu.jar"
     cat(source) #> file(target) !
-}
+  }
